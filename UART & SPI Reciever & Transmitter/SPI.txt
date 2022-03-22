@@ -1,0 +1,111 @@
+*********************************UART,SPI RECEIVER*****************************************************************
+
+//ICU woith External Interrupt
+
+/*
+ * Main.c
+ *
+ *  Created on: ??‏/??‏/????
+ *      Author: Copy Center
+ */
+
+#include "STD_Types.h"
+#include "BIT_MATH.h"
+#include "MEMMAP.h"
+#include <util/delay.h>
+#include <avr/interrupt.h>
+#include "ADC.h"
+#include "TIMER.h"
+#include "EXT_INT.h"
+#include "WDG.h"
+#include "DIO.h"
+#include "LCD.h"
+#include "UART.h"
+#include "LCD.h"
+#define F_CPU 16000000
+
+uint8 d = 0;
+ISR(__vector_13) {
+	d = UDR;
+}
+int main(void) {
+
+	DIO_INIT();
+	SPI_INIT_SLAVE();
+    LCD_INIT();
+	while (1) {
+
+
+
+		/*	if(DIO_READCHANNEL(PINA2)==0 && DIO_READCHANNEL(PINA3)==1){
+		 UART_send_char(0);
+		 }
+		 else if(DIO_READCHANNEL(PINA2)==1 && DIO_READCHANNEL(PINA3)==0){
+		 UART_send_char(1);
+		 }
+		 else{
+
+		 }*/
+		d=SPI_RECIEVE_DATA();
+		LCD_VIDSENDCOMMAND(LCD_Clear);
+		LCD_VIDSENDCHAR(d+48);
+
+
+	}
+
+	return 0;
+}
+****************************************SPI,UART Transmitter************************************************
+//ICU woith External Interrupt
+
+/*
+ * Main.c
+ *
+ *  Created on: ??‏/??‏/????
+ *      Author: Copy Center
+ */
+
+#include "STD_Types.h"
+#include "BIT_MATH.h"
+#include "MEMMAP.h"
+#include <util/delay.h>
+#include <avr/interrupt.h>
+#include "ADC.h"
+#include "TIMER.h"
+#include "EXT_INT.h"
+#include "WDG.h"
+#include "LCD.h"
+#include "SPI.h"
+#include "DIO.h"
+#include "Keypad.h"
+#define F_CPU 16000000
+
+int main(void) {
+
+	DIO_INIT();
+	SPI_INIT_MASTER();
+	uint8 d= 0;
+	while (1) {
+
+
+
+		d=KEYPAD_READ();
+		if(d!=NOT_PRESSED){
+			SPI_SEND_DATA(d);
+		}
+		/*if(DIO_READCHANNEL(PINA2)==0 && DIO_READCHANNEL(PINA3)==1){
+			SPI_SEND_DATA(0);
+		}
+		else if(DIO_READCHANNEL(PINA2)==1 && DIO_READCHANNEL(PINA3)==0){
+			SPI_SEND_DATA(1);
+		}
+		else{
+
+		}*/
+	/*d=	UART_recieve_char();
+	DIO_WRITECHANNEL(PINC0,d);*/
+	}
+
+	return 0;
+}
+*******************************************************************************************************************
